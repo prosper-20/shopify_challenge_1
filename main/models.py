@@ -1,0 +1,49 @@
+from tabnanny import verbose
+from django.db import models
+from django.urls import reverse
+from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    date_posted = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name_plural = "categories"
+
+    def __str__(self):
+        return (self.name)
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    quantity = models.PositiveIntegerField(null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk': self.pk})
+
+
+class Order(models.Model):
+    name = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    order_quantity = models.PositiveIntegerField(null=True)
+
+    def __str__(self):
+        return f'{self.customer}-{self.name}'
